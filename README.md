@@ -1,6 +1,6 @@
 # Joint Order Selection, Allocation, Batching and Picking 
 
-This project contains accompanying code for Zalando Team BART's (Batching Algorithms) publication [Joint Order Selection, Allocation, Batching and Picking for Large Scale Warehouses](https://bart-batching-article.docs.zalando.net/main.html).
+This project contains accompanying code for Zalando Team BART's (Batching Algorithms) publication [Joint Order Selection, Allocation, Batching and Picking for Large Scale Warehouses](https://arxiv.org/abs/2401.04563).
 The instances used to create results in the paper are stored in `instances.zip`.
 
 ## How to use
