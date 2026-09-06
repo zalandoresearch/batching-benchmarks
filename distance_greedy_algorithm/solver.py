@@ -87,10 +87,6 @@ def find_best_order(
 
 
 def greedy_solver(instance: Instance, k: int = None) -> List[Batch]:
-    # k=None: DGA -- every remaining order is a candidate at each step (the
-    # deterministic, full scan). k=int: RDGA -- at each step, sample k orders
-    # uniformly at random (without replacement) from the remaining pool and
-    # take the best of that sample; k=1 is the original RDGA behaviour.
     item_goal = instance.parameters.min_number_requested_items
     # A list (not a set) so the iteration/selection order is deterministic
     # without per-step sorting.
@@ -136,10 +132,7 @@ def greedy_solver(instance: Instance, k: int = None) -> List[Batch]:
             for item in selected_items:
                 warehouse_article_items[item.article].remove(item)
             if k is not None:
-                # O(1) removal: swap the picked order with the last and pop.
-                # The picked order's position within remaining_orders is
-                # sample_idxs[i], where i is its position among the sampled
-                # candidates.
+                # O(1) removal: swap the picked order with the last and pop
                 idx = sample_idxs[candidate_orders.index(selected_order)]
                 remaining_orders[idx] = remaining_orders[-1]
                 remaining_orders.pop()
