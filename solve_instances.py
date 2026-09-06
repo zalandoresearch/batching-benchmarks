@@ -26,7 +26,8 @@ def run(args, name) -> None:
     # Reading a large instance takes seconds, which is most of a randomized run.
     # Time the algorithm itself so the two algorithms stay comparable.
     start_time = time.time()
-    instance.batches = greedy_solver(instance, choose_random_order=args.algo == "rdga")
+    k = args.k if args.algo == "rdga" else None
+    instance.batches = greedy_solver(instance, k=k)
     time_elapsed = round(time.time() - start_time, 3)
     logger.info("batches created")
     logger.info("Evaluating results")
@@ -45,6 +46,13 @@ if __name__ == "__main__":
         help="Specify algorithm: Distance Greedy Algorithm (dga) or Randomized DGA (rdga)",
         default="dga",
         choices=["dga", "rdga"],
+    )
+    parser.add_argument(
+        "-k",
+        type=int,
+        default=1,
+        help="For rdga: number of orders to randomly sample at each step, "
+        "the best of which is used (default: 1). Ignored for dga.",
     )
 
     random.seed(1)
