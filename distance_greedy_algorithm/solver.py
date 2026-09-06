@@ -75,7 +75,7 @@ def find_best_order(
     )
 
 
-def greedy_solver(instance: Instance, choose_random_order=False) -> List[Batch]:
+def greedy_solver(instance: Instance, k: int = None) -> List[Batch]:
     item_goal = instance.parameters.min_number_requested_items
     # A list (not a set) so the iteration/selection order is deterministic
     # without per-step sorting.
@@ -104,11 +104,13 @@ def greedy_solver(instance: Instance, choose_random_order=False) -> List[Batch]:
             and len(batch_selected_items) < item_goal
         ):
             # distinguishing between DGA and RDGA
-            if choose_random_order:
-                # pick one order uniformly at random, without replacement; the
-                # caller's random.seed makes this reproducible
-                idx = random.randrange(len(remaining_orders))
-                candidate_orders = [remaining_orders[idx]]
+            if k is not None:
+                # sample min(k, pool size) orders uniformly at random, without
+                # replacement; the caller's random.seed makes this reproducible
+                sample_idxs = random.sample(
+                    range(len(remaining_orders)), min(k, len(remaining_orders))
+                )
+                candidate_orders = [remaining_orders[i] for i in sample_idxs]
             else:
                 candidate_orders = remaining_orders
             cost, selected_items, selected_order = find_best_order(
@@ -120,8 +122,9 @@ def greedy_solver(instance: Instance, choose_random_order=False) -> List[Batch]:
             batch_selected_items.extend(selected_items)
             for item in selected_items:
                 warehouse_article_items[item.article].remove(item)
-            if choose_random_order:
+            if k is not None:
                 # O(1) removal: swap the picked order with the last and pop
+                idx = sample_idxs[candidate_orders.index(selected_order)]
                 remaining_orders[idx] = remaining_orders[-1]
                 remaining_orders.pop()
             else:

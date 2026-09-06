@@ -23,7 +23,8 @@ def run(args, name) -> None:
     instance = Instance()
     instance.read(path)
     logger.info("Creating batches")
-    instance.batches = greedy_solver(instance, choose_random_order=args.algo == "rdga")
+    k = args.k if args.algo == "rdga" else None
+    instance.batches = greedy_solver(instance, k=k)
     logger.info("batches created")
     time_elapsed = round(time.time() - start_time)
     logger.info("Evaluating results")
@@ -40,6 +41,13 @@ if __name__ == "__main__":
         help="Specify algorithm: Distance Greedy Algorithm (dga) or Randomized DGA (rdga)",
         default="dga",
         choices=["dga", "rdga"],
+    )
+    parser.add_argument(
+        "-k",
+        type=int,
+        default=1,
+        help="For rdga: number of orders to randomly sample at each step, "
+        "the best of which is used (default: 1). Ignored for dga.",
     )
 
     random.seed(1)
