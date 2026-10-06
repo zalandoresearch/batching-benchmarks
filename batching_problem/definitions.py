@@ -159,9 +159,23 @@ class Instance:
             logger.warning("a warehouse item is picked more than once!")
             return False
 
-        if not set(picked_item_ids) <= {item.id for item in self.warehouse_items}:
-            logger.warning("a picked item does not exist in the warehouse!")
-            return False
+        warehouse_items_by_id = {item.id: item for item in self.warehouse_items}
+        for batch in self.batches:
+            for picklist in batch.picklists:
+                for item in picklist:
+                    original = warehouse_items_by_id.get(item.id)
+                    if original is None:
+                        logger.warning("a picked item does not exist in the warehouse!")
+                        return False
+                    if (
+                        item.row, item.aisle, item.zone,
+                        item.article.id, item.article.volume,
+                    ) != (
+                        original.row, original.aisle, original.zone,
+                        original.article.id, original.article.volume,
+                    ):
+                        logger.warning("a picked item differs from the warehouse input!")
+                        return False
 
         batched_order_ids = [
             order.id for batch in self.batches for order in batch.orders
@@ -170,7 +184,18 @@ class Instance:
             logger.warning("an order is assigned to more than one batch!")
             return False
 
+        orders_by_id = {order.id: order for order in self.orders}
         for batch in self.batches:
+            for order in batch.orders:
+                original = orders_by_id.get(order.id)
+                if original is None:
+                    logger.warning("a batched order does not exist in the input!")
+                    return False
+                if sorted(article.id for article in order.positions) != sorted(
+                    article.id for article in original.positions
+                ):
+                    logger.warning("a batched order differs from the input!")
+                    return False
             if len(batch.orders) > self.parameters.max_orders_per_batch:
                 logger.warning("Batch exceeds max commissions limit!")
                 return False
