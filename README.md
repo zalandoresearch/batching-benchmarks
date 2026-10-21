@@ -8,7 +8,7 @@ The instances used to create results in the paper are stored in `instances.zip`.
 1. Clone this project and copy the files into your own project
 2. Generate batching instances via `python generate_instances.py` (any Python 3.6+ works). For each generated instance (per default in the `instances` folder) four files will be created: `{articles, orders, parameters, warehouse_items}.json`. 
 3. Run the Distance Greedy Algorithm (DGA) via `python solve_instances.py`. Two files will be stored per instance under `instances/<instance>/dga/`: `batches.json` and `statistics.json`. The runtime in `statistics.json` covers the algorithm only, not reading the instance from disk.
-4. Run the Randomized DGA via `python solve_instances.py -a rdga`, which writes to `instances/<instance>/rdga/`, optionally with `-k <N>` (default `1`) to sample `N` random orders per step and take the best of them, e.g. `python solve_instances.py -a rdga -k 50`.
+4. Run the Randomized DGA via `python solve_instances.py -a rdga`, which writes to `instances/<instance>/rdga/`. Optionally add `-k <N>` (default `1`) to sample `N` random orders per step and take the best of them, e.g. `python solve_instances.py -a rdga -k 50`.
 5. Write your own solver to outperform these baseline algorithms :)
 
 Run the tests with `python -m unittest discover`.
