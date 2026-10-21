@@ -26,14 +26,19 @@ def run(args, name) -> None:
     # Reading a large instance takes seconds, which is most of a randomized run.
     # Time the algorithm itself so the two algorithms stay comparable.
     start_time = time.time()
-    k = args.k if args.algo == "rdga" else None
-    instance.batches = greedy_solver(instance, k=k)
+    random_sample_size = args.random_sample_size if args.algo == "rdga" else None
+    instance.batches = greedy_solver(instance, random_sample_size=random_sample_size)
     time_elapsed = round(time.time() - start_time, 3)
     logger.info("batches created")
     logger.info("Evaluating results")
     instance.evaluate(time_elapsed)
     logger.info("writing results")
-    result_path = f"{path}/{args.algo}"
+    # Each RDGA sample size gets its own folder so runs with different sizes
+    # don't overwrite each other.
+    if args.algo == "rdga":
+        result_path = f"{path}/rdga_sample{args.random_sample_size}"
+    else:
+        result_path = f"{path}/{args.algo}"
     os.makedirs(result_path, exist_ok=True)
     instance.store_result(result_path)
     logger.info(f"Results for {name} computed and stored in {result_path}.")
@@ -48,7 +53,7 @@ if __name__ == "__main__":
         choices=["dga", "rdga"],
     )
     parser.add_argument(
-        "-k",
+        "--random-sample-size",
         type=int,
         default=1,
         help="For rdga: number of orders to randomly sample at each step, "
